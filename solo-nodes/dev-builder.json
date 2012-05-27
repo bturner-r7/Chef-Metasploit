@@ -1,7 +1,3 @@
-// Chef-solo configuration file
-// Creates an instance of the dev-builder role defined in
-// roles/dev-builder.rb
-
 {
-  'run_list' : ['role[dev-builder]']
+  "run_list": [ "role[dev-builder]" ]
 }
