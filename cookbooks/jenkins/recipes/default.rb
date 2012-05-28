@@ -15,3 +15,57 @@ service "jenkins" do
   action [:start, :enable]
 end
 
+# Activate CLI
+script "download-jenkins-cli" do
+  interpreter "bash"
+  user "root"
+  cwd "/var/run/jenkins/war/WEB-INF"
+  code <<-EOH
+  wget localhost:8080/jnlpJars/jenkins-cli.jar
+  EOH
+end
+
+
+# Install plugins
+#jenkins "github" do
+  #action :install_plugin
+  #cli_jar "/var/run/jenkins/war/WEB-INF/jenkins-cli.jar"
+  #url "http://localhost:8080"
+  #path "/var/lib/jenkins"
+#end
+
+#jenkins "github-oauth" do
+  #action :install_plugin
+  #cli_jar "/var/run/jenkins/war/WEB-INF/jenkins-cli.jar"
+  #url "http://localhost:8080"
+  #path "/var/lib/jenkins"
+#end
+
+
+jenkins "git" do
+  action :install_plugin
+  cli_jar "/var/run/jenkins/war/WEB-INF/jenkins-cli.jar"
+  url "http://localhost:8080"
+  path "/var/lib/jenkins"
+end
+
+jenkins "ruby-metrics" do
+  action :install_plugin
+  cli_jar "/var/run/jenkins/war/WEB-INF/jenkins-cli.jar"
+  url "http://localhost:8080"
+  path "/var/lib/jenkins"
+end
+
+jenkins "brakeman" do
+  action :install_plugin
+  cli_jar "/var/run/jenkins/war/WEB-INF/jenkins-cli.jar"
+  url "http://localhost:8080"
+  path "/var/lib/jenkins"
+end
+
+jenkins "reload config" do
+  action :reload_configuration
+  cli_jar "/var/run/jenkins/war/WEB-INF/jenkins-cli.jar"
+  url "http://localhost:8080"
+  path "/var/lib/jenkins"
+end
