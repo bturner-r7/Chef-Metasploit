@@ -6,9 +6,15 @@ apt_repository "jenkins" do
   key "http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key"
   components ["binary/"]
   action :add
-
-  notifies :run, "apt[apt-get update]", :immediately
 end
+
+# Update apt-get now that we've added the new repo
+execute "apt-get update" do
+  command "apt-get update"
+  ignore_failure true
+  action :run
+end
+
 
 package "jenkins"
 
