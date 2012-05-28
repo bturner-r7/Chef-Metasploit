@@ -7,7 +7,7 @@
 
 # Get deps via apt
 sudo apt-get update
-sudo apt-get install -y build-essential curl libssl-dev libxml2-dev libyaml libxslt-dev libreadline-dev libpq-dev git-core zlib
+sudo apt-get install -y build-essential curl libssl-dev libxml2-dev libyaml-dev libxslt-dev libreadline-dev libpq-dev git-core libzlib-ruby
 
 
 # Install Ruby
