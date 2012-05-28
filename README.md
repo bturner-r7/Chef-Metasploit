@@ -28,6 +28,8 @@ Use this option if you've got nothing more than a bare install of Ubuntu server.
 wget https://raw.github.com/rapid7/Chef-Metasploit/master/bootstrap.sh && bash bootstrap.sh
 </pre>
 
+Now do the stuff in Option 2 below.which 
+
 ### Option #2 - from a prepped snapshot
 You can use this option if you're maintaining a snapshot of the VM post-bootstrap, which you should be.
 

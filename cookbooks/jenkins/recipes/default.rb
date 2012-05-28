@@ -26,6 +26,13 @@ service "jenkins" do
   action [:start, :enable]
 end
 
+# Get the latest Jenkins update center info so we can install plugins
+# curl thanks to Gist: https://gist.github.com/1026918
+execute "update-center" do
+  command "curl  -L http://updates.jenkins-ci.org/update-center.json | sed '1d;$d' | curl -X POST -H 'Accept: application/json' -d @- http://localhost:8080/updateCenter/byId/default/postBack"
+  action :run
+end
+
 
 # Install plugins
 # TODO: make this DRY!
