@@ -6,6 +6,8 @@ apt_repository "jenkins" do
   key "http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key"
   components ["binary/"]
   action :add
+
+  notifies :run, "apt[apt-get update]", :immediately
 end
 
 package "jenkins"

@@ -19,8 +19,10 @@ cd ruby-1.9.3-p194
 sudo ./configure && sudo make && sudo make install
 
 # Install RubyGems
+cd /usr/local/src
 sudo wget http://rubyforge.org/frs/download.php/76073/rubygems-1.8.24.tgz
 cd rubygems-1.8.24 && sudo ruby setup.rb
 
 # Install Chef gem
+cd ~ # might as well go home at this point
 sudo gem install chef --no-rdoc --no-ri
