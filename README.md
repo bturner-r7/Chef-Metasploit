@@ -33,9 +33,9 @@ First, get the cookbooks (this repo):
 sudo git clone https://github.com/rapid7/Chef-Metasploit.git /var/chef
 </pre>
 
-Then fire off a solo run of your desired node type:
+Then fire off a solo run of your desired node type.  This example turns the node into an instance of the "dev-builder" role:
 <pre>
-sudo chef-solo -j /var/chef/solo-notes/dev-builder.json
+sudo chef-solo -j /var/chef/solo-nodes/dev-builder.json
 </pre>
 
 That will start a Chef run and install the things necessary to turn the VM into a development environment suitable for usage with the Jenkins CI/build system.
