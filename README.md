@@ -6,13 +6,17 @@ Using [starter repo from OpsCode](https://github.com/opscode/chef-repo).
 
 
 ## Why Chef?
-Chef provides us the ability to describe our infrastructure configuration in code with very little effort.  Not only have we therefore created documentation of what is required to build our various disparate systems, we've also created runnable code that will create those systems given a basic initial configuration.
+Chef provides us the ability to describe our infrastructure configuration in code with very little effort.  In one step we create documentation of what is required to build our various disparate systems, as well as code that will actually perform the build/configuration operations in a predictable, idempotent way.  
 
-Contrary to what you may have heard, Chef can be useful with even a single server to manage.  The ability to do [Chef Solo runs](http://wiki.opscode.com/display/chef/Chef+Solo) means that setting up a new server from local (to that server) commands is as easy as pulling down the cookbooks and running a single command.  There's no need for a Chef Server to provide command-and-control for the VMs you are configuring.  And conversely, nothing about Chef Solo keeps you from enhancing your Chef setup to include a server in the future.
+Three big things to know about Chef:
+
+* **Chef manages state** -- you'll get the most out of Chef if you don't just think of it as a way to create new nodes, but more broadly as a way to put your infrastructure into a known state.  So you can use it to reset services for different purposes, change the role a VM is being used for, etc.
+* **Chef can work small** -- contrary to what you may have heard, Chef doesn't require huge infrastructure needs to be useful -- you can get a lot out of it with even a single server to manage by using [Chef Solo runs](http://wiki.opscode.com/display/chef/Chef+Solo).  Chef Solo is a mode that lets you use Chef to setup a server *from that server*.  This makes configuring a server as easy as updating a local copy of the cookbooks and calling a single CLI command with the **chef-solo** binary.
+* **Chef can get big** -- nothing about using Chef Solo to manage things node-by-node locks you into that mode of working should you decide to use Chef Server later.  The cookbooks will be exactly the same.
 
 Chef shouldn't be considered an alternative to bash scripts, or an alternative to using VM snapshots taken by your hypervisor.  It's far more capable than configuration management approaches using either of those two things exclusively.  
 
-In fact, our approach to virtual hardware management assumes the usage of all three.
+But we don't descriminate -- our approach to virtual hardware management leverages all three.
 
 
 ## How to use this repo (Chef Solo)
