@@ -49,7 +49,7 @@ jenkins "git" do
   path "/var/lib/jenkins"
 end
 
-jenkins "ruby-metrics" do
+jenkins "rubyMetrics" do
   action :install_plugin
   cli_jar "/var/run/jenkins/war/WEB-INF/jenkins-cli.jar"
   url "http://localhost:8080"
