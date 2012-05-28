@@ -6,7 +6,7 @@ apt_repository "jenkins" do
   key "http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key"
   components ["binary/"]
   action :add
-  notifies :run, "apt-get update", :immediately
+  notifies :run, "execute[apt-get update]", :immediately
 end
 
 # Update apt-get now that we've added the new repo
@@ -24,23 +24,14 @@ service "jenkins" do
   action [:start, :enable]
 end
 
-# Activate CLI
-script "download-jenkins-cli" do
-  interpreter "bash"
-  user "root"
-  cwd "/var/run/jenkins/war/WEB-INF"
-  code <<-EOH
-  wget http://localhost:8080/jnlpJars/jenkins-cli.jar
-  EOH
-end
-
 
 # Install plugins
+# TODO: make this DRY!
 jenkins "github" do
   action :install_plugin
   cli_jar node['jenkins-plugin']['cli-jar']
-  url "http://localhost:8080"
-  path "/var/lib/jenkins"
+  url node['jenkins-plugin']['url']
+  path node['jenkins-plugin']['path']
 end
 
 jenkins "git" do
@@ -69,4 +60,9 @@ jenkins "reload config" do
   cli_jar node['jenkins-plugin']['cli-jar']
   url node['jenkins-plugin']['url']
   path node['jenkins-plugin']['path']
+end
+
+# Need to restart for plugins to take effect
+service "jenkins" do
+  action :restart
 end
