@@ -27,20 +27,12 @@ end
 
 
 # Install plugins
-#jenkins "github" do
-  #action :install_plugin
-  #cli_jar "/var/run/jenkins/war/WEB-INF/jenkins-cli.jar"
-  #url "http://localhost:8080"
-  #path "/var/lib/jenkins"
-#end
-
-#jenkins "github-oauth" do
-  #action :install_plugin
-  #cli_jar "/var/run/jenkins/war/WEB-INF/jenkins-cli.jar"
-  #url "http://localhost:8080"
-  #path "/var/lib/jenkins"
-#end
-
+jenkins "github" do
+  action :install_plugin
+  cli_jar "/var/run/jenkins/war/WEB-INF/jenkins-cli.jar"
+  url "http://localhost:8080"
+  path "/var/lib/jenkins"
+end
 
 jenkins "git" do
   action :install_plugin
