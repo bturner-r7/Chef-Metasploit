@@ -21,7 +21,7 @@ script "download-jenkins-cli" do
   user "root"
   cwd "/var/run/jenkins/war/WEB-INF"
   code <<-EOH
-  wget localhost:8080/jnlpJars/jenkins-cli.jar
+  wget http://localhost:8080/jnlpJars/jenkins-cli.jar
   EOH
 end
 
