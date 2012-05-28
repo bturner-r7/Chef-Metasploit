@@ -6,13 +6,14 @@ apt_repository "jenkins" do
   key "http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key"
   components ["binary/"]
   action :add
+  notifies :run, "apt-get update", :immediately
 end
 
 # Update apt-get now that we've added the new repo
 execute "apt-get update" do
   command "apt-get update"
   ignore_failure true
-  action :run
+  action :nothing
 end
 
 
@@ -37,35 +38,35 @@ end
 # Install plugins
 jenkins "github" do
   action :install_plugin
-  cli_jar "/var/run/jenkins/war/WEB-INF/jenkins-cli.jar"
+  cli_jar node['jenkins-plugin']['cli-jar']
   url "http://localhost:8080"
   path "/var/lib/jenkins"
 end
 
 jenkins "git" do
   action :install_plugin
-  cli_jar "/var/run/jenkins/war/WEB-INF/jenkins-cli.jar"
-  url "http://localhost:8080"
-  path "/var/lib/jenkins"
+  cli_jar node['jenkins-plugin']['cli-jar']
+  url node['jenkins-plugin']['url']
+  path node['jenkins-plugin']['path']
 end
 
 jenkins "rubyMetrics" do
   action :install_plugin
-  cli_jar "/var/run/jenkins/war/WEB-INF/jenkins-cli.jar"
-  url "http://localhost:8080"
-  path "/var/lib/jenkins"
+  cli_jar node['jenkins-plugin']['cli-jar']
+  url node['jenkins-plugin']['url']
+  path node['jenkins-plugin']['path']
 end
 
 jenkins "brakeman" do
   action :install_plugin
-  cli_jar "/var/run/jenkins/war/WEB-INF/jenkins-cli.jar"
-  url "http://localhost:8080"
-  path "/var/lib/jenkins"
+  cli_jar node['jenkins-plugin']['cli-jar']
+  url node['jenkins-plugin']['url']
+  path node['jenkins-plugin']['path']
 end
 
 jenkins "reload config" do
   action :reload_configuration
-  cli_jar "/var/run/jenkins/war/WEB-INF/jenkins-cli.jar"
-  url "http://localhost:8080"
-  path "/var/lib/jenkins"
+  cli_jar node['jenkins-plugin']['cli-jar']
+  url node['jenkins-plugin']['url']
+  path node['jenkins-plugin']['path']
 end
