@@ -7,6 +7,8 @@ apt_repository "jenkins" do
   components ["binary/"]
   action :add
   notifies :run, "execute[apt-get update]", :immediately
+
+  not_if{::File.exists?('/etc/apt/sources.list.d/jenkins-source.list')}
 end
 
 # Update apt-get now that we've added the new repo
