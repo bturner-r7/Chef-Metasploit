@@ -28,7 +28,7 @@ Use this option if you've got nothing more than a bare install of Ubuntu server.
 wget https://raw.github.com/rapid7/Chef-Metasploit/master/bootstrap.sh && bash bootstrap.sh
 </pre>
 
-Now do the stuff in Option 2 below.which 
+Now do the stuff in Option 2 below.
 
 ### Option #2 - from a prepped snapshot
 You can use this option if you're maintaining a snapshot of the VM post-bootstrap, which you should be.
@@ -38,6 +38,9 @@ First, get the cookbooks (this repo):
 <pre>
 sudo git clone https://github.com/rapid7/Chef-Metasploit.git /var/chef
 </pre>
+
+Consider adding a snapshot at this point to allow you to roll back and
+configure the node differently.
 
 Then fire off a solo run of your desired node type.  This example turns the node into an instance of the "dev-builder" role:
 <pre>
