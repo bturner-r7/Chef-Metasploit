@@ -21,6 +21,7 @@ sudo ./configure && sudo make && sudo make install
 # Install RubyGems
 cd /usr/local/src
 sudo wget http://rubyforge.org/frs/download.php/76073/rubygems-1.8.24.tgz
+sudo tar -xzf rubygems-1.8.24.tgz
 cd rubygems-1.8.24 && sudo ruby setup.rb
 
 # Install Chef gem
