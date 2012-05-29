@@ -48,3 +48,14 @@ sudo chef-solo -j /var/chef/solo-nodes/dev-builder.json
 </pre>
 
 That will start a Chef run and install the things necessary to turn the VM into a development environment suitable for usage with the Jenkins CI/build system.
+
+You might see some FATAL errors like:
+<pre>
+[Tue, 29 May 2012 08:30:02 -0700] ERROR: Exception handlers complete
+[Tue, 29 May 2012 08:30:02 -0700] FATAL: Stacktrace dumped to
+/var/chef/cache/chef-stacktrace.out
+[Tue, 29 May 2012 08:30:02 -0700] FATAL: TypeError:
+ruby_block[update-java-alternatives] (java::openjdk line 43) had an
+error: TypeError: can't convert nil into String
+</pre>
+These are not actually fatal. Run the command again and it should work.
