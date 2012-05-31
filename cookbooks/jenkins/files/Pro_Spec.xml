@@ -1,0 +1,237 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Runs RSpec stuff for Pro</description>
+  <logRotator>
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>500</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.coravy.hudson.plugins.github.GithubProjectProperty>
+      <projectUrl>https://github.com/rapid7/pro/</projectUrl>
+    </com.coravy.hudson.plugins.github.GithubProjectProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <name></name>
+        <refspec></refspec>
+        <url>git@pro.github.com:rapid7/pro.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>origin/release</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <disableSubmodules>false</disableSubmodules>
+    <recursiveSubmodules>false</recursiveSubmodules>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <authorOrCommitter>false</authorOrCommitter>
+    <clean>false</clean>
+    <wipeOutWorkspace>false</wipeOutWorkspace>
+    <pruneBranches>false</pruneBranches>
+    <remotePoll>false</remotePoll>
+    <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
+    <gitTool>Default</gitTool>
+    <submoduleCfg class="list"/>
+    <relativeTargetDir></relativeTargetDir>
+    <reference></reference>
+    <excludedRegions></excludedRegions>
+    <excludedUsers></excludedUsers>
+    <gitConfigName></gitConfigName>
+    <gitConfigEmail></gitConfigEmail>
+    <skipTag>false</skipTag>
+    <includedRegions></includedRegions>
+    <scmName></scmName>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector">
+    <hudson.triggers.TimerTrigger>
+      <spec>0 0 * * *</spec>
+    </hudson.triggers.TimerTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+source ~/.bashrc
+rvm use 1.9.3-p125@pro
+export RLS_BRANCH_MSF=release
+export RLS_BRANCH_PRO=release
+
+#
+# This may require some manual tweaking to get right. - The gems should be 
+# in the right place, but currently metasploit_data_models is pulling 
+# from a local path (which would require that it be checked out locally) - jcran 02/29/12
+#
+cd $WORKSPACE/ui
+export RAILS_ENV=test
+
+# Make sure everything is where we think it is.
+
+git fetch
+git branch -D temp
+git checkout -b temp
+git branch -D $RLS_BRANCH_PRO
+git checkout -b $RLS_BRANCH_PRO --track origin/$RLS_BRANCH_PRO
+
+bundle install
+
+#
+# Run the brakeman plugin - checks for known security issues
+#
+gem install brakeman --no-rdoc --no-ri &amp;&amp; brakeman -o brakeman-output.tabs $WORKSPACE/ui
+
+#
+# Ensure we&apos;ve got the latest framework code (currently rails3)
+#
+cd $WORKSPACE/msf3
+git fetch
+git branch -D temp
+git checkout -b temp
+git branch -D $RLS_BRANCH_MSF
+git checkout -b $RLS_BRANCH_MSF --track origin/$RLS_BRANCH_MSF
+
+#
+# Make sure it&apos;s dead first
+#
+if [ -f $WORKSPACE/engine/tmp/pro_ut_develop.pid ]; then
+  sudo kill -9 `cat $WORKSPACE/engine/tmp/pro_ut_develop.pid`
+fi
+
+sudo killall -9 nginx
+
+echo &quot;verifying prosvc is dead&quot;
+ps aux | grep prosvc
+
+# weird case where nginx gets 50505
+ps aux | grep nginx
+
+#
+# Set up prosvc on the dev environment
+#
+
+echo &quot;Starting Prosvc&quot;
+rvmsudo RAILS_ENV=test ruby $WORKSPACE/engine/prosvc.rb -E test &amp;
+echo &quot;hanging out while prosvc starts up&quot;
+sleep 30
+
+#
+# Set up test environment for rails
+#
+export COVERAGE=true
+
+#
+# Run the specs w/ junit output
+#
+cd $WORKSPACE/ui
+
+echo &quot;Running any pending migrations&quot;
+bundle exec rake db:migrate
+
+# That might result in an updated schema -- Should it be committed? No,
+# because some human should have done that.
+
+echo &quot;Running specs&quot;
+bundle exec rspec  --format RspecJunitFormatter --out rspec.xml spec  
+
+#
+# Tear down prosvc
+#
+sudo kill -9 `cat $WORKSPACE/engine/tmp/prosvc.pid`
+sudo killall -9 nginx
+echo &quot;verifying prosvc is dead&quot;
+ps aux | grep prosvc
+# weird case where nginx gets 50505
+ps aux | grep nginx
+
+echo &quot;done!&quot;</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.plugins.brakeman.BrakemanPublisher>
+      <healthy></healthy>
+      <unHealthy></unHealthy>
+      <thresholdLimit>low</thresholdLimit>
+      <pluginName>[BRAKEMAN] </pluginName>
+      <defaultEncoding>UTF-8</defaultEncoding>
+      <canRunOnFailed>false</canRunOnFailed>
+      <useDeltaValues>false</useDeltaValues>
+      <thresholds>
+        <unstableTotalAll></unstableTotalAll>
+        <unstableTotalHigh></unstableTotalHigh>
+        <unstableTotalNormal></unstableTotalNormal>
+        <unstableTotalLow></unstableTotalLow>
+        <failedTotalAll></failedTotalAll>
+        <failedTotalHigh></failedTotalHigh>
+        <failedTotalNormal></failedTotalNormal>
+        <failedTotalLow></failedTotalLow>
+      </thresholds>
+      <shouldDetectModules>false</shouldDetectModules>
+      <dontComputeNew>false</dontComputeNew>
+      <outputFile>ui/brakeman-output.tabs</outputFile>
+    </hudson.plugins.brakeman.BrakemanPublisher>
+    <hudson.tasks.junit.JUnitResultArchiver>
+      <testResults>ui/rspec.xml</testResults>
+      <keepLongStdio>true</keepLongStdio>
+      <testDataPublishers/>
+    </hudson.tasks.junit.JUnitResultArchiver>
+    <hudson.plugins.rubyMetrics.rcov.RcovPublisher>
+      <reportDir>ui/coverage/rcov</reportDir>
+      <targets>
+        <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
+          <metric>TOTAL_COVERAGE</metric>
+          <healthy>80</healthy>
+          <unhealthy>0</unhealthy>
+          <unstable>0</unstable>
+        </hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
+        <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
+          <metric>CODE_COVERAGE</metric>
+          <healthy>80</healthy>
+          <unhealthy>0</unhealthy>
+          <unstable>0</unstable>
+        </hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
+      </targets>
+    </hudson.plugins.rubyMetrics.rcov.RcovPublisher>
+    <hudson.plugins.emailext.ExtendedEmailPublisher>
+      <recipientList>todb@metasploit.com</recipientList>
+      <configuredTriggers>
+        <hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+          <email>
+            <recipientList></recipientList>
+            <subject>$PROJECT_DEFAULT_SUBJECT</subject>
+            <body>$PROJECT_DEFAULT_CONTENT</body>
+            <sendToDevelopers>true</sendToDevelopers>
+            <sendToRequester>false</sendToRequester>
+            <includeCulprits>false</includeCulprits>
+            <sendToRecipientList>true</sendToRecipientList>
+          </email>
+        </hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+      </configuredTriggers>
+      <contentType>default</contentType>
+      <defaultSubject>$DEFAULT_SUBJECT</defaultSubject>
+      <defaultContent>$DEFAULT_CONTENT</defaultContent>
+      <attachmentsPattern></attachmentsPattern>
+    </hudson.plugins.emailext.ExtendedEmailPublisher>
+    <hudson.plugins.statusmonitor.MonitorPublisher/>
+    <hudson.tasks.BuildTrigger>
+      <childProjects>Pro_Generate_Metadata</childProjects>
+      <threshold>
+        <name>SUCCESS</name>
+        <ordinal>0</ordinal>
+        <color>BLUE</color>
+      </threshold>
+    </hudson.tasks.BuildTrigger>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.ansicolor.AnsiColorBuildWrapper/>
+  </buildWrappers>
+</project>
