@@ -50,6 +50,15 @@ jenkins "git" do
   path node['jenkins-plugin']['path']
 end
 
+# Provides a way of doing "release" steps
+jenkins "release" do
+  action :install_plugin
+  cli_jar node['jenkins-plugin']['cli-jar']
+  url node['jenkins-plugin']['url']
+  path node['jenkins-plugin']['path']
+end
+
+# Provides static analysis stuff like RCov, etc
 jenkins "rubyMetrics" do
   action :install_plugin
   cli_jar node['jenkins-plugin']['cli-jar']
@@ -57,7 +66,40 @@ jenkins "rubyMetrics" do
   path node['jenkins-plugin']['path']
 end
 
+# Does security-oriented static analysis of code for Rails vulns
 jenkins "brakeman" do
+  action :install_plugin
+  cli_jar node['jenkins-plugin']['cli-jar']
+  url node['jenkins-plugin']['url']
+  path node['jenkins-plugin']['path']
+end
+
+# For creating promotion chains in Jenkins
+jenkins "promoted-builds" do
+  action :install_plugin
+  cli_jar node['jenkins-plugin']['cli-jar']
+  url node['jenkins-plugin']['url']
+  path node['jenkins-plugin']['path']
+end
+
+# Dep of IRC plugin
+jenkins "instant-messaging" do
+  action :install_plugin
+  cli_jar node['jenkins-plugin']['cli-jar']
+  url node['jenkins-plugin']['url']
+  path node['jenkins-plugin']['path']
+end
+
+# Info and commands from IRC!
+jenkins "ircbot" do
+  action :install_plugin
+  cli_jar node['jenkins-plugin']['cli-jar']
+  url node['jenkins-plugin']['url']
+  path node['jenkins-plugin']['path']
+end
+
+# Changes passing build color from blue to green, because green means go!
+jenkins "greenballs" do
   action :install_plugin
   cli_jar node['jenkins-plugin']['cli-jar']
   url node['jenkins-plugin']['url']
