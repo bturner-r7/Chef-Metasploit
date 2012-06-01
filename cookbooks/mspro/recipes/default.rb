@@ -1,32 +1,75 @@
-# Ensure bundler is available and you're mostly good to go
+#
+# Gets Metasploit commercial versions up and running
+#   - does not manage keys
+#   - does not manage licenses
+
+
+# Bundler installs all Ruby-based library deps
 gem_package "bundler"
 
-execute 'clone code' do
-  command "git clone -depth 1 git@github.com:rapid7/Pro.git #{node['pro-root']}"
+cookbook_file "#{node['rails-root']}/config/database.yml" do
+  source "database.yml"
+  owner node['user']
+  mode "0644"
+end
+
+execute 'clone MSF' do
+  command "git clone --depth 1 git@github.com:rapid7/metasploit-framework.git #{node['msf-root']}"
+  not_if {File.exists? "#{node['msf-root']}"}
+end
+
+execute 'clone Pro' do
+  command "git clone --depth 1 git@github.com:rapid7/pro.git #{node['pro-root']}"
   not_if {File.exists? "#{node['pro-root']}"}
 end
 
-execute 'update code' do
+execute 'update MSF code' do
+  cwd node['msf-root']
+  command "git pull"
+end
+
+execute 'update Pro code' do
   cwd node['pro-root']
   command "git pull"
+end
+
+execute 'switch to develop branch on Pro' do
+  cwd node['pro-root']
+  command "git checkout develop"
+end
+
+link "#{node['pro-root']}/msf3" do
+  to "#{node['msf-root']}"
+end
+
+# Match database.yml
+execute 'create postgres user' do
+  user "postgres"
+  command "createuser -SRd #{node['rails-database']['user']} > /dev/null 2>&1"
+  ignore_failure true # only until we debug why above is thowing dumb error
+end
+
+# Match database.yml -- this command is idempotent
+execute 'set postgres user password' do
+  user "postgres"
+  command "psql -tc \"ALTER USER #{node['rails-database']['user']} WITH PASSWORD '#{node['rails-database']['password']}'\""
 end
 
 # Start prosvc w/ known pid from node attrs
 
 execute 'install bundle' do
-  cwd "#{node['pro-root']}/ui"
+  cwd node['rails-root']
   environment ( {'RAILS_ENV' => 'development'} )
   command "bundle install"
 end
 
-# - set up path to the Rails.root in node data
-# Ensure key file is available -- fail otherwise
-#
-# Pull code from GitHub
-#
-# bundle install
-#
-# create database w/ rake
+# The Rails rake command itself is idempotent
+execute 'create databases' do
+  cwd node['rails-root']
+  environment ( {'RAILS_ENV' => 'development'} )
+  command "rake db:create:all"
+end
+
 #
 # load database w/ rake
 #
