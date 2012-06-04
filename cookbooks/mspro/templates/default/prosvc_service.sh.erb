@@ -1,0 +1,72 @@
+#!/bin/sh
+#
+#   Startup/shutdown script for whatever you need running
+#
+#   Linux chkconfig stuff:
+#
+#   chkconfig: 345 56 10
+#   description: a generic startup script
+
+# put any env init stuff here
+. /etc/init.d/functions
+
+
+# what's the executable you actually want to run
+DAEMON="<%= node['prosvc']['path']%>"
+
+# any options you want to pass to it
+ARGS="-E <%= node['prosvc']['mode']%>"
+
+#what should be shown when service XXX start|stop|restart is invoked?
+prog="Metasploit Pro"
+
+# where and what should be lockfile
+LOCKFILE="<%= node['prosvc']['tmp']%>/prosvc.lock"
+
+
+start () {
+    echo -n $"Starting $prog: "
+
+    # start daemon
+    nohup $DAEMON $ARGS 1>/dev/null 2>&1 &
+        RETVAL=$?
+    echo
+    [ $RETVAL = 0 ] && touch $LOCKFILE
+    return $RETVAL
+}
+
+stop () {
+    # stop daemon
+    echo -n $"Stopping $prog: "
+    killproc $DAEMON
+    RETVAL=$?
+    echo
+    [ $RETVAL = 0 ] && rm -f $LOCKFILE
+}
+
+restart() {
+    stop
+    start
+}
+
+case $1 in
+    start)
+        start
+    ;;
+    stop)
+        stop
+    ;;
+    restart)
+        restart
+    ;;
+    status)
+        status $DAEMON
+        RETVAL=$?
+    ;;
+    *)
+
+    echo $"Usage: $prog {start|stop|restart|status}"
+    exit 3
+esac
+
+exit $RETVAL

@@ -1,0 +1,20 @@
+defaults: &defaults
+  adapter: <%= node['rails-database']['adapter'] %>
+  host: <%= node['rails-database']['host'] %>
+  port: <%= node['rails-database']['port'] %>
+  username: <%= node['rails-database']['username'] %>
+  password: <%= node['rails-database']['adapter'] %>
+  pool: <%= node['rails-database']['pool'] %>
+  timeout: <%= node['rails-database']['timeout'] %>
+
+development:
+  database: <%= node['rails-database']['development'] %>
+  <<: *defaults
+
+production:
+  database: <%= node['rails-database']['production'] %>
+  <<: *defaults
+
+test: 
+  database: <%= node['rails-database']['test'] %>
+  <<: *defaults

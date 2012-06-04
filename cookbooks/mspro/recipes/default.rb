@@ -55,7 +55,6 @@ execute 'set postgres user password' do
   command "psql -tc \"ALTER USER #{node['rails-database']['user']} WITH PASSWORD '#{node['rails-database']['password']}'\""
 end
 
-# Start prosvc w/ known pid from node attrs
 
 execute 'install bundle' do
   cwd node['rails-root']
@@ -70,7 +69,21 @@ execute 'create databases' do
   command "rake db:create:all"
 end
 
-#
-# load database w/ rake
-#
-# start the server process
+execute 'kill prosvc' do
+  cwd "#{node['pro-root']}/engine/tmp"
+  user "root"
+  command "kill -9 `cat prosvc.pid` && rm prosvc.pid"
+  not_if{!(File.exists? "#{node['pro-root']}/engine/tmp/prosvc.pid")} # don't do it if no PID
+  ignore_failure true
+end
+
+execute 'start prosvc' do
+  cwd "#{node['pro-root']}/engine"
+  user "root"
+  environment ( {'RAILS_ENV' => 'development'} )
+  command "./prosvc.rb -E #{node['prosvc']['mode']} &"
+  only_if{!(File.exists? "#{node['pro-root']}/engine/tmp/prosvc.pid")} # only do it if no PID
+end
+
+
+# start the Rails server process
