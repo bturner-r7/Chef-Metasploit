@@ -106,6 +106,14 @@ jenkins "greenballs" do
   path node['jenkins-plugin']['path']
 end
 
+# Talks to TestLink test plan tracking system
+jenkins "testlink" do
+  action :install_plugin
+  cli_jar node['jenkins-plugin']['cli-jar']
+  url node['jenkins-plugin']['url']
+  path node['jenkins-plugin']['path']
+end
+
 jenkins "reload config" do
   action :reload_configuration
   cli_jar node['jenkins-plugin']['cli-jar']
