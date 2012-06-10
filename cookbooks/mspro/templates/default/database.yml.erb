@@ -3,7 +3,7 @@ defaults: &defaults
   host: <%= node['rails-database']['host'] %>
   port: <%= node['rails-database']['port'] %>
   username: <%= node['rails-database']['username'] %>
-  password: <%= node['rails-database']['adapter'] %>
+  password: <%= node['rails-database']['password'] %>
   pool: <%= node['rails-database']['pool'] %>
   timeout: <%= node['rails-database']['timeout'] %>
 

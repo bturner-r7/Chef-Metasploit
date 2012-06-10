@@ -2,6 +2,9 @@
 # Gets Metasploit commercial versions up and running
 #   - does not manage keys
 #   - does not manage licenses
+#
+# WARNING: in order to run this recipe, you must have a GitHub deploy 
+# key for the Pro repo in the root user's .ssh dir.
 
 
 # Bundler installs all Ruby-based library deps
@@ -10,11 +13,13 @@ gem_package "bundler"
 
 execute 'clone MSF' do
   command "git clone --depth 1 git@github.com:rapid7/metasploit-framework.git #{node['msf-root']}"
+  user node['user']
   not_if {File.exists? "#{node['msf-root']}"}
 end
 
 execute 'clone Pro' do
   command "git clone --depth 1 git@github.com:rapid7/pro.git #{node['pro-root']}"
+  user node['user']
   not_if {File.exists? "#{node['pro-root']}"}
 end
 
@@ -37,11 +42,14 @@ link "#{node['pro-root']}/msf3" do
   to "#{node['msf-root']}"
 end
 
+# Generate and place database.yml
 template "#{node['rails-root']}/config/database.yml" do
   source "database.yml.erb"
   owner node['user']
   mode "0644"
 end
+
+
 
 # Match database.yml
 execute 'create postgres user' do
@@ -70,21 +78,22 @@ execute 'create databases' do
   command "rake db:create:all"
 end
 
-#execute 'stop prosvc' do
-  #cwd "#{node['pro-root']}/engine/tmp"
-  #user "root"
-  #command "kill -9 `cat prosvc.pid` && rm prosvc.pid"
-  #not_if{!(File.exists? "#{node['pro-root']}/engine/tmp/prosvc.pid")} # don't do it if no PID
-  #ignore_failure true
-#end
 
-#execute 'start prosvc' do
-  #cwd "#{node['pro-root']}/engine/scripts"
-  #user "root"
-  #environment ( {'RAILS_ENV' => 'test', 'PROSVC_ENV' => node['prosvc']['env']} )
-  #command "./ctl.sh start"
-  #only_if{!(File.exists? "#{node['pro-root']}/engine/tmp/prosvc.pid")} # only do it if no PID
-#end
+#---------- prosvc ------------------------------------------
+# Generate and place start/stop init.d script for prosvc
+template "/etc/init.d/prosvc" do
+  source "prosvc_service.sh.erb"
+  owner "root"
+  mode "0744"
+end
 
+# Declare prosvc as a service
+service "prosvc" do
+  supports [:start, :stop, :restart]
+  action :enable
+end
 
-# start the Rails server process
+service "prosvc" do
+  action :restart
+end
+

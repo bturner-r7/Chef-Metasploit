@@ -7,25 +7,24 @@
 #   chkconfig: 345 56 10
 #   description: a generic startup script
 
-# put any env init stuff here
-. /etc/init.d/functions
-
+# Load Ubuntu init-functions
+. /lib/lsb/init-functions
 
 # what's the executable you actually want to run
 DAEMON="<%= node['prosvc']['path']%>"
 
 # any options you want to pass to it
-ARGS="-E <%= node['prosvc']['mode']%>"
+ARGS="-E <%= node['prosvc']['env']%>"
 
 #what should be shown when service XXX start|stop|restart is invoked?
 prog="Metasploit Pro"
 
 # where and what should be lockfile
-LOCKFILE="<%= node['prosvc']['tmp']%>/prosvc.lock"
+LOCKFILE="<%= node['pro-root']%>/engine/tmp/prosvc.lock"
 
 
 start () {
-    echo -n $"Starting $prog: "
+    echo -n "Starting $prog: "
 
     # start daemon
     nohup $DAEMON $ARGS 1>/dev/null 2>&1 &
@@ -37,8 +36,8 @@ start () {
 
 stop () {
     # stop daemon
-    echo -n $"Stopping $prog: "
-    killproc $DAEMON
+    echo -n "Stopping $prog: "
+    kill -9 `pidof prosvc`
     RETVAL=$?
     echo
     [ $RETVAL = 0 ] && rm -f $LOCKFILE
