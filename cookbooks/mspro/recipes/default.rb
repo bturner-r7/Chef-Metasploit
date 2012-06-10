@@ -25,31 +25,34 @@ end
 
 execute 'update MSF code' do
   cwd node['msf-root']
+  user node['user']
   command "git pull"
 end
 
 execute 'update Pro code' do
   cwd node['pro-root']
+  user node['user']
   command "git pull"
 end
 
 execute 'switch to develop branch on Pro' do
   cwd node['pro-root']
+  user node['user']
   command "git checkout develop"
 end
 
 link "#{node['pro-root']}/msf3" do
   to "#{node['msf-root']}"
+  user node['user']
 end
 
 # Generate and place database.yml
 template "#{node['rails-root']}/config/database.yml" do
+  user node['user']
   source "database.yml.erb"
   owner node['user']
   mode "0644"
 end
-
-
 
 # Match database.yml
 execute 'create postgres user' do
