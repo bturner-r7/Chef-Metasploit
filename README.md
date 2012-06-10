@@ -21,17 +21,16 @@ But we don't descriminate -- our approach to virtual hardware management leverag
 
 ## How to use this repo (Chef Solo)
 
-### Option #1 - from scratch
-Use this option if you've got nothing more than a bare install of Ubuntu server.  In this case, you can get Chef-ready with this one-liner (requires sudo):
+### Step 1
+Start here if you've got nothing more than a bare install of Ubuntu server.  In this case, you can get Chef-ready with this one-liner (requires sudo):
 
 <pre>
 wget https://raw.github.com/rapid7/Chef-Metasploit/master/bootstrap.sh && bash bootstrap.sh
 </pre>
 
-Now do the stuff in Option 2 below:
 
-### Option #2 - from a prepped snapshot
-You can use this option if you're maintaining a snapshot of the VM post-bootstrap, which you should be.
+### Step 2
+(Skip Step 1 and start here if you're maintaining a snapshot of the VM post-bootstrap, which you should be)
 
 First, get the cookbooks (this repo):
 
@@ -47,9 +46,12 @@ Then fire off a solo run of your desired node type.  This example turns the node
 sudo chef-solo -j /var/chef/solo-nodes/dev-builder.json
 </pre>
 
-That will start a Chef run and install the things necessary to turn the VM into a development environment suitable for usage with the Jenkins CI/build system.
+That will start a Chef run and install the basics necessary to turn the VM into a development environment suitable for usage with the Jenkins CI/build system.
 
-You might see some FATAL errors like:
+### Tip: Chef idempotence
+
+During a run, you might see some unexpected fatal errors.  Example:
+
 <pre>
 [Tue, 29 May 2012 08:30:02 -0700] ERROR: Exception handlers complete
 [Tue, 29 May 2012 08:30:02 -0700] FATAL: Stacktrace dumped to
@@ -58,4 +60,5 @@ You might see some FATAL errors like:
 ruby_block[update-java-alternatives] (java::openjdk line 43) had an
 error: TypeError: can't convert nil into String
 </pre>
-These are not actually fatal. Run the command again and it should work.
+
+These can be caused from things like network errors, etc and not usually fatal. Run the command again and it should work.  The beauty of Chef (well one of many) is that it won't do things again that it doesn't need to.  If running the command a couple times doesn't get you where you want to be, there's probably something wrong with the recipe.
