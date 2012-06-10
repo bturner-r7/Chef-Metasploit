@@ -14,24 +14,28 @@ gem_package "bundler"
 execute 'clone MSF' do
   command "git clone --depth 1 git@github.com:rapid7/metasploit-framework.git #{node['msf-root']}"
   user node['user']
+  group node['user']
   not_if {File.exists? "#{node['msf-root']}"}
 end
 
 execute 'clone Pro' do
   command "git clone --depth 1 git@github.com:rapid7/pro.git #{node['pro-root']}"
   user node['user']
+  group node['user']
   not_if {File.exists? "#{node['pro-root']}"}
 end
 
 execute 'update MSF code' do
   cwd node['msf-root']
   user node['user']
+  group node['user']
   command "git pull"
 end
 
 execute 'update Pro code' do
   cwd node['pro-root']
   user node['user']
+  group node['user']
   command "git pull"
 end
 
@@ -43,7 +47,6 @@ end
 
 link "#{node['pro-root']}/msf3" do
   to "#{node['msf-root']}"
-  user node['user']
 end
 
 # Generate and place database.yml

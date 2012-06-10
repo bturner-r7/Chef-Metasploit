@@ -24,7 +24,7 @@ LOCKFILE="<%= node['pro-root']%>/engine/tmp/prosvc.lock"
 
 
 start () {
-    echo -n "Starting $prog: "
+    echo -n "Starting $prog"
 
     # start daemon
     nohup $DAEMON $ARGS 1>/dev/null 2>&1 &
@@ -36,7 +36,7 @@ start () {
 
 stop () {
     # stop daemon
-    echo -n "Stopping $prog: "
+    echo -n "Stopping $prog"
     kill -9 `pidof prosvc`
     RETVAL=$?
     echo
