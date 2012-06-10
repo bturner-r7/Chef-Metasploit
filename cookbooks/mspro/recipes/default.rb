@@ -4,52 +4,42 @@
 #   - does not manage licenses
 #
 # WARNING: in order to run this recipe, you must have a GitHub deploy 
-# key for the Pro repo in the root user's .ssh dir.
+# key for the Pro repo in the default['user'] user's .ssh dir.
 
 
 # Bundler installs all Ruby-based library deps
 gem_package "bundler"
 
 
-execute 'clone MSF' do
-  command "git clone --depth 1 git@github.com:rapid7/metasploit-framework.git #{node['msf-root']}"
+# NOTE ON GIT RESOURCES: the "reference" variable is the branch that 
+# is checked out as "deploy" on the node.  E.g. you will not see a 
+# branch called "develop", you will see a branch called "deploy" with 
+# content identical to develop.
+
+git "msf" do
+  destination node["msf-root"]
+  repository "git@github.com:rapid7/metasploit-framework.git"
+  depth 1
+  reference node['msf-git-branch']
   user node['user']
   group node['user']
-  not_if {File.exists? "#{node['msf-root']}"}
+  action :sync
 end
 
-execute 'clone Pro' do
-  command "git clone --depth 1 git@github.com:rapid7/pro.git #{node['pro-root']}"
+git "pro" do
+  destination node["pro-root"]
+  repository "git@github.com:rapid7/pro.git"
+  depth 1
+  reference node['pro-git-branch']
   user node['user']
   group node['user']
-  not_if {File.exists? "#{node['pro-root']}"}
-end
-
-execute 'update MSF code' do
-  cwd node['msf-root']
-  user node['user']
-  group node['user']
-  command "git pull"
-end
-
-execute 'update Pro code' do
-  cwd node['pro-root']
-  user node['user']
-  group node['user']
-  command "git pull"
-end
-
-execute 'switch to develop branch on Pro' do
-  cwd node['pro-root']
-  user node['user']
-  command "git checkout develop"
+  action :sync
 end
 
 link "#{node['pro-root']}/msf3" do
   to "#{node['msf-root']}"
 end
 
-# Generate and place database.yml
 template "#{node['rails-root']}/config/database.yml" do
   user node['user']
   source "database.yml.erb"
@@ -57,19 +47,16 @@ template "#{node['rails-root']}/config/database.yml" do
   mode "0644"
 end
 
-# Match database.yml
 execute 'create postgres user' do
   user "postgres"
   command "createuser -SRd #{node['rails-database']['username']} > /dev/null 2>&1"
   ignore_failure true # only until we debug why above is thowing dumb error
 end
 
-# Match database.yml -- this command is idempotent
 execute 'set postgres user password' do
   user "postgres"
   command "psql -tc \"ALTER USER #{node['rails-database']['username']} WITH PASSWORD '#{node['rails-database']['password']}'\""
 end
-
 
 execute 'install bundle' do
   cwd node['rails-root']

@@ -3,6 +3,10 @@ default['msf-root'] = "/home/#{default['user']}/msf3"
 default['pro-root'] = "/home/#{default['user']}/pro"
 default['rails-root'] = "#{default['pro-root']}/ui"
 
+# GIT information
+default['msf-git-branch'] = "master"
+default['pro-git-branch'] = "develop"
+
 # The Rails/Prosvc environment to use
 default['pro-env'] = "test"
 
@@ -22,4 +26,4 @@ default['rails-database']['test'] = "pro_test"
 default['rails-database']['production'] = "pro_prod"
 
 default['prosvc']['path'] = "#{default['pro-root']}/engine/prosvc.rb"
-default['prosvc']['env'] = "test"
+default['prosvc']['env'] = default['pro-env']
