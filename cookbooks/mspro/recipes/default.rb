@@ -7,11 +7,6 @@
 # Bundler installs all Ruby-based library deps
 gem_package "bundler"
 
-template "#{node['rails-root']}/config/database.yml" do
-  source "database.yml.erb"
-  owner node['user']
-  mode "0644"
-end
 
 execute 'clone MSF' do
   command "git clone --depth 1 git@github.com:rapid7/metasploit-framework.git #{node['msf-root']}"
@@ -40,6 +35,12 @@ end
 
 link "#{node['pro-root']}/msf3" do
   to "#{node['msf-root']}"
+end
+
+template "#{node['rails-root']}/config/database.yml" do
+  source "database.yml.erb"
+  owner node['user']
+  mode "0644"
 end
 
 # Match database.yml
