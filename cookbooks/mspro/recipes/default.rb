@@ -60,14 +60,14 @@ end
 
 execute 'install bundle' do
   cwd node['rails-root']
-  environment ( {'RAILS_ENV' => 'development'} )
+  environment ( {'RAILS_ENV' => node['pro-env']} )
   command "bundle install"
 end
 
 # The Rails rake command itself is idempotent
 execute 'create databases' do
   cwd node['rails-root']
-  environment ( {'RAILS_ENV' => 'development'} )
+  environment ( {'RAILS_ENV' => node['pro-env']} )
   command "rake db:create:all"
 end
 
