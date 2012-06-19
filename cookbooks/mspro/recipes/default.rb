@@ -7,8 +7,6 @@
 # key for the Pro repo in the default['user'] user's .ssh dir.
 
 
-package 'nmap'
-
 # Bundler installs all Ruby-based library deps
 gem_package "bundler"
 
