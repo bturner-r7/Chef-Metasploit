@@ -1,11 +1,10 @@
 name "mspro-prod"
 description "A sets up a Metasploit commercial version with all development and test gems and boots it in production mode"
+override_attributes(
+  "pro-env" => "production"
+)
 run_list(
-  "recipe[vim]",
-  "recipe[java]",
-  "recipe[openssh]",
-  "recipe[postgresql]",
-  "recipe[postgresql::server]",
-  "recipe[mspro]",
+  "role[dev-builder]",
+  "recipe[mspro]"
 )
 
