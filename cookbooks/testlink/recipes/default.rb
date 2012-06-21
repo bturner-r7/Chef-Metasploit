@@ -60,4 +60,3 @@ include_recipe "mysql::server"
 # iptables
 
 # Add other allowed users
-
