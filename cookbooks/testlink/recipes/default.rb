@@ -17,11 +17,9 @@ end
 execute "apparmor change mysql to complain" do
   command "sudo /etc/init.d/apparmor stop"
   command "sudo /etc/init.d/apparmor teardown"
-  ignore_failure false
 end
 
 # 4.x+
-# TODO Still failing:
 include_recipe "mysql::server"
 #include_recipe "mysql::client"
 
