@@ -3,6 +3,7 @@ description "Instance of TestLink (QA application)"
 
 run_list(
   "recipe[vim]",
+  "recipe[openssl::default]",
   "recipe[mysql::server]",
   "recipe[apache2]",
   # PHP5.2 for 1.8, 5.2/5.3 for 1.9
