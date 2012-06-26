@@ -12,6 +12,8 @@ db_user = "testlink_db"
 
 # -----------------------------
 
+package "php5-mysql"
+
 directory app_dir do
   mode "0644"
   group "root"
@@ -47,8 +49,8 @@ end
 execute "Database creation and configuration" do
   user "root"
   command "mysql -u root -proot -e 'CREATE DATABASE if not exists #{db}' &&
-  mysql -u root -proot -e 'CREATE USER #{db_user} identified by \"#{db_pass}\"' &&
-  mysql -u root -proot -e 'GRANT SELECT, INSERT, UPDATE, DELETE on #{db}.* to #{db_user}' &&
+  mysql -u root -proot -e 'CREATE USER #{db_user}' &&
+  mysql -u root -proot -e 'GRANT SELECT, INSERT, UPDATE, DELETE on #{db}.* to #{db_user}@\"localhost\" identified by \"#{db_pass}\"' &&
   mysql -u root -proot #{db} < #{app_dir}/install/sql/mysql/testlink_create_tables.sql &&
   mysql -u root -proot #{db} < #{app_dir}/install/sql/mysql/testlink_create_default_data.sql"
 end
@@ -61,13 +63,25 @@ cookbook_file "#{app_dir}/config_db.inc.php" do
   group "root"
 end
 
-# TODO Configure Apache to serve
-
 execute "remove install dir" do
   user "root"
   command "rm -rf #{app_dir}/install"
 end
 
-# TODO iptables
-# TODO Correct perms above, restrict access
-# TODO Add other allowed users
+execute "Set app dir perms" do
+  user "root"
+  command "chown -R www-data:www-data #{app_dir} &&
+           chmod -R 775 #{app_dir}"
+end
+
+
+# Install steps complete.
+# Now go to http://IP/testlink/index.php
+# Default creds: admin/admin
+#
+# ----------------------------------------
+# TODO Mail config:
+# Copy config.inc.php to custom_config.inc.php, fill out [SMTP]
+# TODO Configure Apache for DNS
+# TODO Add SSH users
+# TODO iptables config
