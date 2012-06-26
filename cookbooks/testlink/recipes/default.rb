@@ -4,15 +4,21 @@
 # Installation guide: http://www.teamst.org/_tldoc/1.8/installation_manual.pdf
 # -----------------------------
 
-# Create application dir
-directory "/var/www/testlink" do
+app_dir = "/var/www/testlink"
+db = "testlink"
+# TODO Move these elsewhere
+db_pass = "m6w2msmV"
+db_user = "testlink_db"
+
+# -----------------------------
+
+directory app_dir do
   mode "0644"
   group "root"
   owner "root"
   action :create
 end
 
-# Copy installer file, expand
 cookbook_file "/tmp/testlink-1.9.2.tar.gz" do
   source "testlink-1.9.2.tar.gz"
   mode 0755
@@ -20,31 +26,48 @@ cookbook_file "/tmp/testlink-1.9.2.tar.gz" do
   group "root"
 end
 
-execute "file-extraction_perm-fix" do
+execute "File extraction and chown" do
   user "root"
-  command "tar -xzf /tmp/testlink-1.9.2.tar.gz -C /var/www/testlink"
-  command "mv /var/www/testlink/testlink-1.9.2/* /var/www/testlink"
-  command "rm -rf /var/www/testlink/testlink-1.9.2"
-  command "chown -R root:root /var/www/testlink"
-  # TODO Fix chmod: templates_c, upload_area and logs apache writeable
+  command "tar -xzf /tmp/testlink-1.9.2.tar.gz -C #{app_dir} &&
+           chown -R root:root #{app_dir}/testlink-1.9.2"
+end
+execute "File moving" do
+  user "root"
+  command "mv #{app_dir}/testlink-1.9.2/* #{app_dir}"
+end
+execute "Perm/access fixing" do
+  user "root"
+  command "chown -R root:root #{app_dir} &&
+           chmod -R 777 #{app_dir}/upload_area &&
+           chmod -R 777 #{app_dir}/logs &&
+           rm -rf #{app_dir}/testlink-1.9.2"
 end
 
 # Add DB and tables, user
-execute "DB-setup" do
+execute "Database creation and configuration" do
   user "root"
-  command "mysql -u root -proot -e 'CREATE DATABASE testlink'"
-  command "mysql -u root -proot testlink < /var/www/testlink/install/sql/mysql/testlink_create_tables.sql"
-  command "mysql -u root -proot testlink < /var/www/testlink/install/sql/mysql/testlink_create_default_data.sql"
-  # TODO Setup DB user for testlink
+  command "mysql -u root -proot -e 'CREATE DATABASE if not exists #{db}' &&
+  mysql -u root -proot -e 'CREATE USER #{db_user} identified by \"#{db_pass}\"' &&
+  mysql -u root -proot -e 'GRANT SELECT, INSERT, UPDATE, DELETE on #{db}.* to #{db_user}' &&
+  mysql -u root -proot #{db} < #{app_dir}/install/sql/mysql/testlink_create_tables.sql &&
+  mysql -u root -proot #{db} < #{app_dir}/install/sql/mysql/testlink_create_default_data.sql"
 end
 
 # PHP config file
-# config_db.inc.php
+cookbook_file "#{app_dir}/config_db.inc.php" do
+  source "config_db.inc.php"
+  mode 0755
+  owner "root"
+  group "root"
+end
 
-# Configure Apache to serve
+# TODO Configure Apache to serve
 
-# Remove install dir
+execute "remove install dir" do
+  user "root"
+  command "rm -rf #{app_dir}/install"
+end
 
-
-# iptables
-# Add other allowed users
+# TODO iptables
+# TODO Correct perms above, restrict access
+# TODO Add other allowed users
