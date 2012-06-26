@@ -4,11 +4,12 @@
 #
 # MS currently ships with 5.61TEST4
 
-# TODO Make this OS independent:
-package "build-essential"
+include_recipe "build-essential"
 
-installer_file = "nmap-6.01.tar.bz2"
-expanded_dir = "nmap-6.01"
+# Installs 5.6 as that ships with MS
+# Latest included in files: nmap-6.01.tar.bz2
+installer_file = "nmap-5.61TEST4.tar.bz2"
+expanded_dir = "nmap-5.61TEST4"
 
 cookbook_file "/tmp/#{installer_file}" do
   source installer_file
