@@ -4,6 +4,14 @@
 #
 # MS currently ships with 5.61TEST4
 
+execute "installed check" do
+  not_if do
+    File.exist? "/usr/local/bin/nmap"
+  end
+  # TODO Exit properly, this works by accident
+  command "exit 1"
+end
+
 include_recipe "build-essential"
 
 # Installs 5.6 as that ships with MS
