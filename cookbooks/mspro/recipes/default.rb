@@ -8,7 +8,7 @@
 
 execute "user check" do
   not_if do
-    File.exist? "/home/#{node['msbuilder']}"
+    File.exist? "/home/#{node['user']}"
   end
   #log ("#{node['msbuilder']} user does not exist. Please create and populate with proper SSH key.") { level :fatal }
   # TODO This will indeed exit the recipe,
