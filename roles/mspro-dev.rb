@@ -4,7 +4,7 @@ override_attributes(
   "pro-env" => "development"
 )
 run_list(
-  "role[dev-builder]",
+  "role[base-machine]",
   "recipe[mspro]"
 )
 

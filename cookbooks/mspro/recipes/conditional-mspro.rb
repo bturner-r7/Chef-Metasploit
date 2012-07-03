@@ -16,11 +16,8 @@ execute "user check" do
   command "exit 1"
 end
 
-# Be sure to add your private SSH key with access to GitHub repos to this user
-
 # Bundler installs all Ruby-based library deps
 gem_package "bundler"
-
 
 # NOTE ON GIT RESOURCES: the "reference" variable is the branch that 
 # is checked out as "deploy" on the node.  E.g. you will not see a 

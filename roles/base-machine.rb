@@ -1,5 +1,5 @@
-name "dev-builder"
-description "A development environment suitable for executing certain build steps"
+name "base-machine"
+description "A development environment"
 run_list(
   "recipe[vim]",
   "recipe[java]",
