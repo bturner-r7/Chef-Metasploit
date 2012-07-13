@@ -32,7 +32,7 @@ git "msf" do
   reference node['msf-git-branch']
   user node['user']
   group node['user']
-  action :checkout
+  action :sync
 end
 
 git "pro" do
@@ -42,7 +42,7 @@ git "pro" do
   reference node['pro-git-branch']
   user node['user']
   group node['user']
-  action :checkout
+  action :sync
 end
 
 link "#{node['pro-root']}/msf3" do
