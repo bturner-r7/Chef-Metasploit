@@ -13,11 +13,12 @@
 # what's the executable you actually want to run
 DAEMON="<%= node['prosvc']['path']%>"
 
-# any options you want to pass to it
-ARGS="-E <%= node['prosvc']['env']%>"
+# Default to development
+ENVIRON="development"
+ARGS="-E $ENVIRON"
 
 #what should be shown when service XXX start|stop|restart is invoked?
-prog="Metasploit Pro"
+prog="Metasploit Pro ($ENVIRON)"
 
 # where and what should be lockfile
 LOCKFILE="<%= node['pro-root']%>/engine/tmp/prosvc.lock"
