@@ -67,7 +67,16 @@ execute 'set postgres user password' do
   command "psql -tc \"ALTER USER #{node['rails-database']['username']} WITH PASSWORD '#{node['rails-database']['password']}'\""
 end
 
+# May not be needed
+#execute 'set superuser perms' do
+#  user "postgres"
+#  command "psql -tc \"ALTER ROLE #{node['rails-database']['username']} WITH superuser\""
+#end
+
+#---------- Gems, Rails ------------------------------------------
+# TODO Not really working?
 execute 'install bundle' do
+  user node['user']
   cwd node['rails-root']
   environment ( {'RAILS_ENV' => node['pro-env']} )
   command "bundle install"
@@ -98,4 +107,11 @@ end
 service "prosvc" do
   action :restart
 end
+
+# TODO
+#execute "Create initial MS user" do
+#  user "msbuilder"
+#  command "RAILS_ENV=development /home/#{node['user']}/pro/ui/script/createuser"
+#end
+
 
