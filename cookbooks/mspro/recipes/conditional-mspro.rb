@@ -68,15 +68,15 @@ execute 'set postgres user password' do
 end
 
 # May not be needed
-#execute 'set superuser perms' do
-#  user "postgres"
-#  command "psql -tc \"ALTER ROLE #{node['rails-database']['username']} WITH superuser\""
-#end
+execute 'set superuser perms' do
+  user "postgres"
+  command "psql -tc \"ALTER ROLE #{node['rails-database']['username']} WITH superuser\""
+end
 
 #---------- Gems, Rails ------------------------------------------
 # TODO Not really working?
 execute 'install bundle' do
-  user node['user']
+  user "root"
   cwd node['rails-root']
   environment ( {'RAILS_ENV' => node['pro-env']} )
   command "bundle install"
