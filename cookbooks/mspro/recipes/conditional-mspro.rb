@@ -3,11 +3,21 @@
 #   - does not manage keys
 #   - does not manage licenses
 #
-# WARNING: in order to run this recipe, you must have a GitHub deploy 
-# key for the Pro repo in the default['user'] user's .ssh dir.
-
 # Bundler installs all Ruby-based library deps
 gem_package "bundler"
+
+# WARNING: in order to run this recipe, you must have a GitHub deploy 
+# key for the Pro repo in the default['user'] user's .ssh dir.
+execute "SSH key check for #{node['user']}" do
+  not_if do
+    File.exist? "/home/#{node['user']}/.ssh/id_rsa"
+  end
+  #log ("#{node['user']} user does not exist. Please create and populate with proper SSH key.") { level :fatal }
+  # TODO This will indeed exit the recipe,
+  # but with an exception. Find the real way to exit a recipe...
+  command "exit 1"
+end
+
 
 # NOTE ON GIT RESOURCES: the "reference" variable is the branch that 
 # is checked out as "deploy" on the node.  E.g. you will not see a 

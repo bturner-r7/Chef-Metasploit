@@ -1,24 +1,7 @@
-msbuilder_ready = false
+msbuilder_created = File.exists? "/home/#{node['user']}"
 
-execute "add user" do
-  not_if do
-    File.exist? "/home/#{node['user']}"
-  end
-  user "root"
-  command "useradd -m #{node['user']} && usermod -aG sudo #{node['user']} && echo \"#{node['password']}:#{node['user']}\" | chpasswd"
-end
-
-execute "SSH key check for #{node['user']}" do
-  not_if do
-    File.exist? "/home/#{node['user']}/.ssh/id_rsa"
-  end
-  user "root"
-  msbuilder_ready = false
-end
-
-
-if msbuilder_ready
+if msbuilder_created
   include_recipe "mspro::conditional-mspro"
 else
-  Chef::Log.fatal "/home/#{node['user']} does not have GitHub-enabled private SSH key in place, please add."
+  Chef::Log.fatal "/home/#{node['user']} does not exist. Please add with a GitHub-enabled ssh key to continue."
 end
