@@ -19,5 +19,5 @@ end
 if msbuilder_ready
   include_recipe "mspro::conditional-mspro"
 else
-  Chef::Log.fatal "/home/#{node['user']} does not exist. Create this user and add a GitHub-enabled private key to continue with dev setup."
+  Chef::Log.fatal "/home/#{node['user']} does not have GitHub-enabled private SSH key in place, please add."
 end
