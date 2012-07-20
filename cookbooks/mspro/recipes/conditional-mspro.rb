@@ -6,11 +6,19 @@
 # WARNING: in order to run this recipe, you must have a GitHub deploy 
 # key for the Pro repo in the default['user'] user's .ssh dir.
 
-execute "user check" do
+execute "add user" do
   not_if do
     File.exist? "/home/#{node['user']}"
   end
-  #log ("#{node['msbuilder']} user does not exist. Please create and populate with proper SSH key.") { level :fatal }
+  user "root"
+  command "useradd -d #{node['user']} && usermod -aG sudo #{node['user']}"
+end
+
+execute "SSH key check for #{node['user']}" do
+  not_if do
+    File.exist? "/home/#{node['user']}/.ssh/id_rsa"
+  end
+  #log ("#{node['user']} user does not exist. Please create and populate with proper SSH key.") { level :fatal }
   # TODO This will indeed exit the recipe,
   # but with an exception. Find the real way to exit a recipe...
   command "exit 1"
@@ -111,7 +119,7 @@ end
 
 # TODO
 #execute "Create initial MS user" do
-#  user "msbuilder"
+#  user "#{node['user']}"
 #  command "RAILS_ENV=development /home/#{node['user']}/pro/ui/script/createuser"
 #end
 
