@@ -58,6 +58,7 @@ end
 
 execute 'create postgres user' do
   user "postgres"
+  # Not superuser, not allowed to create new roles, can create new DBs:
   command "createuser -SRd #{node['rails-database']['username']} > /dev/null 2>&1"
   ignore_failure true # only until we debug why above is thowing dumb error
 end
