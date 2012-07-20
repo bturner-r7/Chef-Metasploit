@@ -10,6 +10,13 @@
 # Load Ubuntu init-functions
 . /lib/lsb/init-functions
 
+LOGFILE="/var/log/prosvc.log"
+
+log()
+{
+  /bin/echo "`date` - $*" | tee -a $LOGFILE
+}
+
 # what's the executable you actually want to run
 DAEMON="<%= node['prosvc']['path']%>"
 
@@ -25,10 +32,10 @@ LOCKFILE="<%= node['pro-root']%>/engine/tmp/prosvc.lock"
 
 
 start () {
-    echo -n "Starting $prog"
+    log "Starting $prog"
 
     # start daemon
-    nohup $DAEMON $ARGS 1>/dev/null 2>&1 &
+    nohup $DAEMON $ARGS >> $LOGFILE 2>&1 &
         RETVAL=$?
     echo
     [ $RETVAL = 0 ] && touch $LOCKFILE
@@ -37,7 +44,7 @@ start () {
 
 stop () {
     # stop daemon
-    echo -n "Stopping $prog"
+    log "Stopping $prog"
     kill -9 `pidof prosvc`
     RETVAL=$?
     echo
