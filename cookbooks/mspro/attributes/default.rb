@@ -1,4 +1,5 @@
 default['user'] = "msbuilder"
+default['password'] = "msbuilder"
 default['msf-root'] = "/home/#{default['user']}/msf3"
 default['pro-root'] = "/home/#{default['user']}/pro"
 default['rails-root'] = "#{default['pro-root']}/ui"
