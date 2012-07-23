@@ -111,10 +111,12 @@ end
 
 
 #---------- Misc cleanup ------------------------------------------
-execute 're-install bundle' do
-  user "#{node['user']}"
-  cwd node['rails-root']
-  environment ( {'RAILS_ENV' => node['pro-env']} )
-  command "bundle install"
-end
+# This does execute with the right user and cwd, but somehow still tries to drop into a .bundle in the *running user's* home
+# dir, which will get permission denied
+#execute 're-install bundle' do
+#  user "#{node['user']}"
+#  cwd node['rails-root']
+#  environment ( {'RAILS_ENV' => node['pro-env']} )
+#  command "bundle install"
+#end
 
