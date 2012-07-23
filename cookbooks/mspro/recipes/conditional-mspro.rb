@@ -68,14 +68,8 @@ execute 'set postgres user password' do
   command "psql -tc \"ALTER USER #{node['rails-database']['username']} WITH PASSWORD '#{node['rails-database']['password']}'\""
 end
 
-# May not be needed
-#execute 'set superuser perms' do
-  #user "postgres"
-  #command "psql -tc \"ALTER ROLE #{node['rails-database']['username']} WITH superuser\""
-#end
-
 #---------- Gems, Rails ------------------------------------------
-# TODO Not really working?
+# TODO Not really working, requires doing once as msbuilder
 execute 'install bundle' do
   user "root"
   cwd node['rails-root']
@@ -109,10 +103,18 @@ service "prosvc" do
   action :restart
 end
 
-# TODO
+# Faster in web UI:
 #execute "Create initial MS user" do
 #  user "#{node['user']}"
 #  command "RAILS_ENV=development /home/#{node['user']}/pro/ui/script/createuser"
 #end
 
+
+#---------- Misc cleanup ------------------------------------------
+execute 're-install bundle' do
+  user "#{node['user']}"
+  cwd node['rails-root']
+  environment ( {'RAILS_ENV' => node['pro-env']} )
+  command "bundle install"
+end
 
