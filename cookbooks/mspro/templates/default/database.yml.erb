@@ -18,3 +18,7 @@ production:
 test: 
   database: <%= node['rails-database']['test'] %>
   <<: *defaults
+  
+cucumber: 
+  database: <%= node['rails-database']['test'] %>
+  <<: *defaults
