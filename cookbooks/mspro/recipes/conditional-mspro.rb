@@ -69,7 +69,6 @@ execute 'set postgres user password' do
 end
 
 #---------- Gems, Rails ------------------------------------------
-# TODO Not really working, requires doing once as msbuilder
 execute 'install bundle' do
   user "root"
   cwd node['rails-root']
