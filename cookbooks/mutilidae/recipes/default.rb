@@ -1,11 +1,12 @@
 include_recipe "apache"
 include_recipe "perl"
 include_recipe "php"
+include_recipe "mysql"
 
 
 # Get Mutilidae itself - make it webroot
 remote_file "/var/www/" do
-  source  "http://sourceforge.net/projects/mutillidae/files/mutillidae-project/LATEST-mutillidae-2.3.7.zip"
+  source  "http://sourceforge.net/projects/mutillidae/files/latest/download?source=files"
 end
 
 service "apache2" do
