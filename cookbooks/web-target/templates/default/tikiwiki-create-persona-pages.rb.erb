@@ -1,0 +1,96 @@
+#!/usr/bin/env ruby
+
+require 'faker'
+require 'faker_credit_card'
+require 'faker_ssn'
+require 'faker_patient'
+require 'mysql'
+
+class TikiPersona
+
+  attr_accessor :desc, :fullname, :firstname, :lastname, :dob, :ssn
+  attr_accessor :phone,  :email, :ccn, :cctype, :cc_expiry
+
+  def initialize(description)
+    @desc = description
+    generate_credit_card
+    @firstname = Faker::Name.first_name
+    @lastname = Faker::Name.last_name
+    @fullname = "#{firstname} #{lastname}"
+    @phone = Faker::PhoneNumber.phone_number
+    @email = Faker::Internet.safe_email
+    @dob =  cc_expiry = Faker::Patient.dob.strftime("%d/%m/%y")
+    @ssn = Faker::Ssn.en_ssn
+  end
+
+  def generate_credit_card
+    credit_cards = [:amex, :visa, :mastercard, :discover]
+    case credit_cards[rand(4)]
+    when :amex
+      @ccn =Faker::CreditCard::AmericanExpress.number
+      @cctype = "American Express"
+    when :visa
+      @ccn =Faker::CreditCard::Visa.number
+      @cctype = "Visa"
+    when :mastercard
+      @ccn =Faker::CreditCard::MasterCard.number
+      @cctype = "MasterCard"
+    when :discover
+      @ccn =Faker::CreditCard::Discover.number
+      @cctype = "Discover"
+    end
+    @cc_expiry = Faker::Patient.dob.strftime("%m/%y")
+  end
+
+  def to_s
+    output = <<EOF
+    #{fullname}
+      DoB: #{dob}
+      SSN: #{ssn}
+      Phone: #{phone}
+      Email: #{email}
+      Credit Card: #{cctype}
+        #: #{ccn}
+        expiry: #{cc_expiry}
+EOF
+  end
+
+end
+
+iterations = ARGV[0].to_i
+
+if iterations.nil? or iterations == 0
+  puts "Enter the number of persona pages to create!"
+  return
+end
+
+puts "Establishing connection to DB"
+agent = Mysql.new('localhost', 'root', '<%= node['mysql']['server_root_password'] %>', '<%= node['web-target']['tikiwiki']['db_name'] %>')
+links = ""
+
+iterations.times do |i|
+  persona = TikiPersona.new("persona#{i}-#{rand(500)}")
+  puts "Inserting Persona #{i} into DB"
+  agent.query("INSERT into tiki_pages (pageName,description,data) VALUES (\"#{persona.desc}\",\"#{persona.fullname}\", \"#{persona.to_s}\")")
+  links << "((#{persona.desc}||#{persona.fullname}))\n"
+end
+
+res = agent.query("Select page_id from tiki_pages where pageName=\"Customers\"")
+row = res.fetch_row
+if row.nil?
+  puts "Building customers Page"
+  agent.query("INSERT into tiki_pages (pageName,description,data) VALUES (\"Customers\", \"Customer List\", \"#{links}\")")
+  res = agent.query("Select data from tiki_pages where page_id=1")
+  data = res.fetch_row[0]
+  data << "\n ((Customers||Customer List)) \n"
+  puts "Adding customers Link to HomePage"
+  agent.query("UPDATE tiki_pages set data=\"#{data}\" where page_id=1")
+else
+  res = agent.query("Select data from tiki_pages where page_id=#{row[0]}")
+  data= res.fetch_row[0]
+  data << links
+  puts "Updating Customers Page"
+  agent.query("UPDATE tiki_pages set data=\"#{data}\" where page_id=#{row[0]}")
+end
+
+
