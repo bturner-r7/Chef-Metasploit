@@ -1,4 +1,4 @@
-name "LAMP stack"
+name "LAMP-stack"
 description "For playing w/ Apache, MySQL, PHP"
 run_list(
   "recipe[vim]",
