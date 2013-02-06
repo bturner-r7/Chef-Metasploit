@@ -30,5 +30,16 @@ fi
 # Install Chef gem
 cd ~ # might as well go home at this point
 
+# Until we upgrade to chef 11, we need to manually install
+# net-ssh dependencies or we get into dependency hell
+# TODO: Remove these lines when upgrading to chef 11
+sudo gem install net-ssh-gateway --no-rdoc --no-ri --version 1.1.0
+sudo gem install net-ssh-multi --no-rdoc --no-ri --ignore-dependencies --version 1.1
+sudo gem install net-ssh --no-rdoc --no-ri --ignore-dependencies --version "~> 2.2.2"
+
 # get older Chef until all 11.0 upgrade issues fixed -- 2013-02-05
-sudo gem install chef --no-rdoc --no-ri --version 10.18.2
+sudo gem install chef --no-rdoc --no-ri --conservative --version "< 11"
+
+# TODO: Remove after installing chef 11
+sudo gem uninstall net-ssh-gateway --ignore-dependencies --version ">= 1.1.1"
+sudo gem uninstall net-ssh --ignore-dependencies --version ">= 2.3"
