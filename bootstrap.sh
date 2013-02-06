@@ -29,4 +29,6 @@ fi
 
 # Install Chef gem
 cd ~ # might as well go home at this point
-sudo gem install chef --no-rdoc --no-ri
+
+# get older Chef until all 11.0 upgrade issues fixed -- 2013-02-05
+sudo gem install chef --no-rdoc --no-ri --version 10.18.2
