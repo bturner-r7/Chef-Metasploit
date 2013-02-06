@@ -49,3 +49,10 @@ echo "ALTER ROLE postgres ENCRYPTED PASSWORD '#{node[:postgresql][:password][:po
   end
   action :run
 end
+
+node[:postgresql][:users].each do |user|
+  pg_user user[:username] do
+    privileges :superuser => user["superuser"], :createdb => user["createdb"], :login => user["login"]
+    password user["password"]
+  end
+end

@@ -36,6 +36,7 @@ First, get the cookbooks (this repo):
 
 <pre>
 sudo git clone https://github.com/rapid7/Chef-Metasploit.git /var/chef
+sudo git submodule update --init
 </pre>
 
 Consider adding a snapshot at this point to allow you to roll back and

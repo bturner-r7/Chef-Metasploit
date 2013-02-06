@@ -1,0 +1,88 @@
+#!/usr/bin/env ruby
+
+require 'faker'
+require 'mysql'
+require 'securerandom'
+
+class TikiLorem 
+
+  attr_accessor :page_name, :page_desc, :page_data, :page_links, :dbagent
+
+  #Expects a name and  can take an array of TikiLorem object to build links for
+  def initialize(name, agent, links = [])
+    @dbagent = agent
+    @page_name = name
+    @page_desc = Faker::Lorem.sentence
+    @page_data = Faker::Lorem.paragraph(20)
+    @page_links = links 
+    unless page_links.empty?
+      generate_links
+    end
+  end
+
+  #Add links to the content
+  def generate_links
+    page_links.each do |page|
+      @page_data << "\n((#{page.page_name}||#{page.page_desc}))"
+    end
+  end
+
+  def write_to_db
+    dbagent.query("INSERT INTO tiki_pages (pageName,description,data) VALUES (\"#{page_name}\", \"#{page_desc}\", \"#{page_data}\")")
+  end
+
+  #Append link to the existing db record's content
+  def append_link(linked_page)
+     link = "\n((#{linked_page.page_name}|| #{linked_page.page_desc}))\n"
+     puts "Adding link from #{page_name} to #{linked_page.page_name}"
+     dbagent.query("UPDATE tiki_pages set data=CONCAT(`data`, \"#{link}\") where pageName=\"#{page_name}\"")
+  end
+
+end
+
+def create_base_pages
+  pages = []
+  10.times do |i|
+    name = "lorem#{SecureRandom.hex(16)}"
+    lorem = TikiLorem.new(name,@agent)
+    puts "Writing Base Page #{i} to Wiki"
+    lorem.write_to_db
+    pages << lorem
+  end
+  return pages
+end
+
+def create_second_level
+  second_pages = []
+  5.times do |i|
+    base_pages = create_base_pages
+    name = "lorem2#{SecureRandom.hex(16)}"
+    lorem = TikiLorem.new(name,@agent, base_pages)
+    puts "Writing Second Level Page to Wiki"
+    lorem.write_to_db
+    second_pages << lorem
+  end
+  return second_pages
+end
+
+def create_third_level
+  third_pages = []
+  8.times do |i|
+    second_pages = create_second_level
+    name = "lorem3#{SecureRandom.hex(16)}"
+    lorem = TikiLorem.new(name,@agent, second_pages)
+    puts "Writing Third Level Page to Wiki"
+    lorem.write_to_db
+    third_pages << lorem
+    second_pages.first.append_link(lorem)
+  end
+  return third_pages
+end
+
+@agent = Mysql.new('localhost', 'root', '<%= node['mysql']['server_root_password'] %>', '<%= node['web-target']['tikiwiki']['db_name'] %>')
+home_page = TikiLorem.new("HomePage",@agent)
+create_third_level.each do |page|
+  home_page.append_link(page)
+end
+
+

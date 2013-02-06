@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+require 'mysql'
+agent = Mysql.new('localhost', 'root', '<%= node['mysql']['server_root_password'] %>', '<%= node['web-target']['tikiwiki']['db_name'] %>')
+
+res = agent.query("UPDATE tiki_pages set data='' where page_id=1")
+puts "Reset Main Page content"
+
+res = agent.query("DELETE from tiki_pages where page_id<>1")
+puts "Deleted all other pages"
+
