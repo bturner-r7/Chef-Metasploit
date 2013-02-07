@@ -18,7 +18,7 @@ default['web-target']['tikiwiki']['download_url'] = 'http://downloads.sourceforg
 default['web-target']['tikiwiki']['version'] = '1.9.4'
 
 # Websploit-Tests
-default['web-target']['websploit-tests']['git_repo'] = 'git@github.com:rapid7/Websploit-Tests.git'
+default['web-target']['websploit-tests']['git_repo'] = 'git://github.com/rapid7/Websploit-Tests.git'
 default['web-target']['websploit-tests']['git_rev'] = 'master'
 
 # XMLmao

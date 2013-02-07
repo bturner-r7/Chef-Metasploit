@@ -12,9 +12,7 @@ include_recipe "web-target::sqlol"
 include_recipe "web-target::tikiwiki"
 include_recipe "web-target::webdav"
 
-# Uncomment to install R7-proprietary tests
-# requires SSH key
-# include_recipe "web-target::websploit-tests"
+include_recipe "web-target::websploit-tests"
 
 include_recipe "web-target::xmlmao"
 include_recipe "web-target::xssmh"
