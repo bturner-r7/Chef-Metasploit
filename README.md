@@ -50,6 +50,17 @@ sudo chef-solo -j /var/chef/solo-nodes/base-machine.json
 
 That will start a Chef run and install the basics necessary to turn the VM into a development environment suitable for usage with the Jenkins CI/build system.
 
+### Note: Installing net-ssh
+
+Attempting to run chef to install recipes on some linux distros have resulted in the error "could not find net-ssh (~>)" being returned.
+You can resolve this issue by running the following command: 
+
+<pre>
+sudo gem install net-ssh
+</pre>
+
+Once the gem is installed, you should be able to successfully run your chef recipe.  
+
 ### Tip: Chef idempotence
 
 During a run, you might see some unexpected fatal errors.  Example:
