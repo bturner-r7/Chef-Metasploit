@@ -52,7 +52,7 @@ That will start a Chef run and install the basics necessary to turn the VM into 
 
 ### Note: Installing net-ssh
 
-Attempting to run chef to install recipes on some linux distros have resulted in the error "could not find net-ssh (~>)" being returned.
+Attempting to run chef to install recipes on some linux distros have resulted in the error "could not find net-ssh (~> 2.6)" being returned.
 You can resolve this issue by running the following command: 
 
 <pre>
